@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<form action="http://localhost:5000/choose_columns" method="POST"
+      enctype="multipart/form-data">
+
+    <p>Choose label field</p>
+    <select name="label"> <!--Supplement an id here instead of using 'name'-->
+        {% for column in columns %}
+        <option value="{{ column }}">{{ column }}</option>
+        {% endfor %}
+    </select>
+
+    <p>Choose features</p>
+    {% for column in columns %}
+    <div>
+        <input type="checkbox" id="{{ column }}" name="feature" value="{{ column }}">
+        <label for="{{ column }}">{{ column }}</label>
+    </div>
+    {% endfor %}
+
+    <br />
+    <input type="submit" value="Next" />
+</form>
+{% endblock %}

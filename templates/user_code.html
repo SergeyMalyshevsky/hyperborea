@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<form action="http://localhost:5000/user_code" method="POST"
+      enctype="multipart/form-data">
+
+    <pre>def preprocess_data(features):
+
+    # Start user code
+    </pre>
+    <textarea name="user_code" rows="20" cols="100">{{ user_code }}</textarea>
+    <pre>    # End user code
+
+    return features</pre>
+    <input type="submit" value="Next" />
+</form>
+{% endblock %}

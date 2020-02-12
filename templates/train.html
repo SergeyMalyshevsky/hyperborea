@@ -1,0 +1,17 @@
+<!-- index.html -->
+{% extends 'layout.html' %}
+
+{% block content %}
+<form action="http://localhost:5000/train" method="POST"
+      enctype="multipart/form-data">
+
+    <p>Choose Machine Learning algorithm</p>
+    <select name="algorithm"> <!--Supplement an id here instead of using 'name'-->
+        {% for key, value in ml_algorithms.items() %}
+        <option value="{{ key }}">{{ value }}</option>
+        {% endfor %}
+    </select>
+    <br /><br />
+    <input type="submit" value="Train"/>
+</form>
+{% endblock %}

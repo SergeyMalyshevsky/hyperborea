@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<form action="http://localhost:5000/result" method="POST"
+      enctype="multipart/form-data">
+
+    <a href="/">Return to dataset upload</a>
+    <br />
+    <a href="/user_code">Return to choose ML algorithm</a>
+    <br />
+    <p>Choose index field</p>
+    <select name="index"> <!--Supplement an id here instead of using 'name'-->
+        {% for column in columns %}
+        <option value="{{ column }}">{{ column }}</option>
+        {% endfor %}
+    </select>
+
+    <br />
+    <br />
+    <input type="submit"/>
+</form>
+{% endblock %}

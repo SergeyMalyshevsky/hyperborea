@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<a href="/user_code">Return to choose ML algorithm</a>
+<br />
+<h3>Training model results</h3>
+<h4>Score: {{ score }}</h4>
+<div class="progress">
+  <div class="progress-bar" role="progressbar" style="width: {{ (score * 100) | round | int }}%;" aria-valuenow="{{ score * 100}}" aria-valuemin="0" aria-valuemax="100">{{ score * 100 }} %</div>
+</div>
+<hr />
+<p>Download test data: </p>
+<form action="http://localhost:5000/predict" method="POST"
+      enctype="multipart/form-data">
+    <input type="file" name="test_data"/>
+    <input type="submit" value="Next" />
+</form>
+{% endblock %}
