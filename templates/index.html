@@ -4,7 +4,20 @@
 <h3>Upload dataset</h3>
 <form action="http://localhost:5000/uploader" method="POST"
       enctype="multipart/form-data">
+
+    {% if not task_type %}
+    <p>Choose task type</p>
+    <select name="task_type"> <!--Supplement an id here instead of using 'name'-->
+        <option value="classification">Classificaton</option>
+        <option value="regression">Regression</option>
+    </select>
+    <br />
+    <br />
+    {% else %}
+    <input type="hidden" name="task_type" value="{{ task_type }}"/>
+    {% endif %}
+
     <input type="file" name="dataset"/>
-    <input type="submit" value="Next" />
+    <input type="submit" value="Next"/>
 </form>
 {% endblock %}

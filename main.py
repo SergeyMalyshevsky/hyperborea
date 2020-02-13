@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, RadiusNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -55,11 +55,11 @@ def create_preprocessor(X_train):
     return preprocessor
 
 
-def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree'):
+def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree', task_type='classification'):
     data = pd.read_csv(dataset)
 
     # get features and labels
-    features, y_train = get_features_and_labels(data, fields['features'], fields['label'])
+    features, y_train = get_features_and_labels(data, fields['features'], fields['label'], task_type=task_type)
 
     preprocess_data_func = preprocess_data_function()
 
@@ -77,27 +77,31 @@ def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree'
     preprocessor = create_preprocessor(X_train)
 
     # train model
-    if algorithm == 'decision_tree':
-        model = DecisionTreeClassifier(random_state=241)
-    elif algorithm == 'logistic_regression':
-        model = LogisticRegression()
-    elif algorithm == 'knn':
-        model = KNeighborsClassifier()
-    # elif algorithm == 'rn':
-    #     model = RadiusNeighborsClassifier()
-    elif algorithm == 'svm':
-        model = svm.SVC(random_state=241)
-    elif algorithm == 'naive_bayes':
-        model = GaussianNB()
-    elif algorithm == 'sgd':
-        model = SGDClassifier(random_state=241)
-    elif algorithm == 'mlp':
-        model = MLPClassifier(random_state=241)
-    elif algorithm == 'rf':
-        model = RandomForestClassifier(random_state=241)
-    elif algorithm == 'gradient_boosting':
-        model = GradientBoostingClassifier(random_state=241)
+    if task_type == 'classification':
+        if algorithm == 'decision_tree':
+            model = DecisionTreeClassifier(random_state=241)
+        elif algorithm == 'logistic_regression':
+            model = LogisticRegression()
+        elif algorithm == 'knn':
+            model = KNeighborsClassifier()
+        # elif algorithm == 'rn':
+        #     model = RadiusNeighborsClassifier()
+        elif algorithm == 'svm':
+            model = svm.SVC(random_state=241)
+        elif algorithm == 'naive_bayes':
+            model = GaussianNB()
+        elif algorithm == 'sgd':
+            model = SGDClassifier(random_state=241)
+        elif algorithm == 'mlp':
+            model = MLPClassifier(random_state=241)
+        elif algorithm == 'rf':
+            model = RandomForestClassifier(random_state=241)
+        elif algorithm == 'gradient_boosting':
+            model = GradientBoostingClassifier(random_state=241)
 
+    if task_type == 'regression':
+        if algorithm == 'decision_tree':
+            model = DecisionTreeRegressor(random_state=241)
 
     pipeline = Pipeline(steps=[('preprocessor', preprocessor),
                                ('model', model)
@@ -108,7 +112,10 @@ def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree'
     # save the model to disk
     pickle.dump(pipeline, open(saved_model_filename, 'wb'))
 
-    score = cross_val_score(pipeline, X_train, y_train, cv=5)
+    scoring = None
+    if task_type == 'regression':
+        scoring = 'neg_mean_absolute_error'
+    score = cross_val_score(pipeline, X_train, y_train, cv=5, scoring=scoring)
     return score
 
 

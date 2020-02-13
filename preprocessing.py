@@ -4,7 +4,7 @@ import numpy
 from sklearn.preprocessing import LabelEncoder
 
 
-def get_features_and_labels(data, feature_fields, label=None):
+def get_features_and_labels(data, feature_fields, label=None, task_type='classification'):
     y = None
 
     feature_fields_with_label = deepcopy(feature_fields)
@@ -13,13 +13,14 @@ def get_features_and_labels(data, feature_fields, label=None):
     # features = data[feature_fields_with_label].fillna(data[feature_fields_with_label].mean())
     features = data[feature_fields_with_label]
 
-
-
     if label:
-        y = features[label].values
-        encoder = LabelEncoder()
-        encoder.fit(y)
-        print("Encoder classes", encoder.classes_)
-        numpy.save('classes.npy', encoder.classes_)
+        if task_type == 'classification':
+            y = features[label].values
+            encoder = LabelEncoder()
+            encoder.fit(y)
+            print("Encoder classes", encoder.classes_)
+            numpy.save('classes.npy', encoder.classes_)
+        if task_type == 'regression':
+            y = features[label].values
 
     return features, y

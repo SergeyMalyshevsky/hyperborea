@@ -26,7 +26,19 @@ def get_table_dict():
 
 @app.route('/')
 def main():
-    return render_template('./index.html')
+    return render_template('./index.html', task_type="")
+
+
+@app.route('/classification')
+def classification():
+    task_type = "classification"
+    return render_template('./index.html', task_type=task_type)
+
+
+@app.route('/regression')
+def regression():
+    task_type = "regression"
+    return render_template('./index.html', task_type=task_type)
 
 
 @app.route('/about')
@@ -37,6 +49,10 @@ def about():
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
+        task_type = request.form['task_type']
+        if not task_type:
+            return 'Task type does not choose'
+
         dataset = request.files['dataset']
         if dataset:
             filename = secure_filename(dataset.filename)
@@ -46,6 +62,7 @@ def upload_file():
 
             table_dict = {}
             table_dict['dataset_file'] = file_path
+            table_dict['task_type'] = task_type
             save_table_dict(table_dict)
 
             return render_template('./columns.html', columns=columns)
@@ -79,18 +96,25 @@ def user_code():
         with open("user_code.txt", 'w') as f:
             f.write(user_code)
 
-    ml_algorithms = {
-        'decision_tree': 'Decision Tree',
-        'logistic_regression': 'Logistic Regression',
-        'knn': 'Nearest Neighbors',
-        # 'rn': 'Radius Neighbors',
-        'svm': 'Support Vector Machines',
-        'naive_bayes': 'Gaussian Naive Bayes',
-        'sgd': 'Stochastic Gradient Descent',
-        'mlp': 'Multi-layer Perceptron',
-        'rf': 'Random Forest',
-        'gradient_boosting': 'Gradient Boosting',
-    }
+    table_dict = get_table_dict()
+    if table_dict['task_type'] == 'classification':
+        ml_algorithms = {
+            'decision_tree': 'Decision Tree',
+            'logistic_regression': 'Logistic Regression',
+            'knn': 'Nearest Neighbors',
+            # 'rn': 'Radius Neighbors',
+            'svm': 'Support Vector Machines',
+            'naive_bayes': 'Gaussian Naive Bayes',
+            'sgd': 'Stochastic Gradient Descent',
+            'mlp': 'Multi-layer Perceptron',
+            'rf': 'Random Forest',
+            'gradient_boosting': 'Gradient Boosting',
+        }
+
+    if table_dict['task_type'] == 'regression':
+        ml_algorithms = {
+            'decision_tree': 'Decision Tree',
+        }
 
     return render_template('./train.html', ml_algorithms=ml_algorithms)
 
@@ -104,10 +128,11 @@ def train():
         table_dict['saved_model_filename'] = saved_model_filename
         save_table_dict(table_dict)
 
-        score = train_model(table_dict['dataset_file'], table_dict['params'], saved_model_filename, algorithm)
+        score = train_model(table_dict['dataset_file'], table_dict['params'], saved_model_filename, algorithm,
+                            table_dict['task_type'])
         avg_score = sum(score) / len(score)
 
-        return render_template('./score.html', score=avg_score)
+        return render_template('./score.html', score=avg_score, task_type=table_dict['task_type'])
 
 
 @app.route('/predict', methods=['GET', 'POST'])
