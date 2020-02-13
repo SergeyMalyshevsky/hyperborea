@@ -114,6 +114,11 @@ def user_code():
     if table_dict['task_type'] == 'regression':
         ml_algorithms = {
             'decision_tree': 'Decision Tree',
+            'linear_regression': 'Linear Regression',
+            'knn': 'Nearest Neighbors',
+            'mlp': 'Multi-layer Perceptron',
+            'rf': 'Random Forest',
+            'gradient_boosting': 'Gradient Boosting',
         }
 
     return render_template('./train.html', ml_algorithms=ml_algorithms)

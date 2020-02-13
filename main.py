@@ -3,12 +3,13 @@ from copy import deepcopy
 
 import pandas as pd
 from sklearn import svm
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from sklearn.linear_model import SGDClassifier, LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingClassifier, \
+    GradientBoostingRegressor
+from sklearn.linear_model import SGDClassifier, LogisticRegression, LinearRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier, RadiusNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, RadiusNeighborsClassifier
+from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -102,6 +103,16 @@ def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree'
     if task_type == 'regression':
         if algorithm == 'decision_tree':
             model = DecisionTreeRegressor(random_state=241)
+        elif algorithm == 'linear_regression':
+            model = LinearRegression()
+        elif algorithm == 'knn':
+            model = KNeighborsRegressor()
+        elif algorithm == 'mlp':
+            model = MLPRegressor(random_state=241)
+        elif algorithm == 'rf':
+            model = RandomForestRegressor(random_state=241)
+        elif algorithm == 'gradient_boosting':
+            model = GradientBoostingRegressor(random_state=241)
 
     pipeline = Pipeline(steps=[('preprocessor', preprocessor),
                                ('model', model)
