@@ -82,7 +82,11 @@ def choose_columns():
             }
             save_table_dict(table_dict)
 
-            with open("user_code.txt", "r") as f:
+            if not os.path.isfile('model/user_code.txt'):
+                f = open("model/user_code.txt", "x")
+                f.close()
+
+            with open("model/user_code.txt", "r") as f:
                 lines = f.readlines()
             user_code = "".join(lines)
 
@@ -93,7 +97,7 @@ def choose_columns():
 def user_code():
     if request.method == 'POST':
         user_code = request.form['user_code']
-        with open("user_code.txt", 'w') as f:
+        with open("model/user_code.txt", 'w') as f:
             f.write(user_code)
 
     table_dict = get_table_dict()
@@ -129,7 +133,7 @@ def train():
     if request.method == 'POST':
         algorithm = request.form['algorithm']
         table_dict = get_table_dict()
-        saved_model_filename = "my_model.sav"
+        saved_model_filename = "model/my_model.sav"
         table_dict['saved_model_filename'] = saved_model_filename
         save_table_dict(table_dict)
 

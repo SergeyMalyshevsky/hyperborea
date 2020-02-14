@@ -1,5 +1,5 @@
 def preprocess_data_function():
-    with open("user_data_preprocessing.txt", "r") as f:
+    with open("model/user_code.txt", "r") as f:
         lines = f.readlines()
     user_code = "".join(lines)
     code = '''

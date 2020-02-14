@@ -10,7 +10,6 @@ def get_features_and_labels(data, feature_fields, label=None, task_type='classif
     feature_fields_with_label = deepcopy(feature_fields)
     if label:
         feature_fields_with_label.append(label)
-    # features = data[feature_fields_with_label].fillna(data[feature_fields_with_label].mean())
     features = data[feature_fields_with_label]
 
     if label:
@@ -19,7 +18,7 @@ def get_features_and_labels(data, feature_fields, label=None, task_type='classif
             encoder = LabelEncoder()
             encoder.fit(y)
             print("Encoder classes", encoder.classes_)
-            numpy.save('classes.npy', encoder.classes_)
+            numpy.save('model/classes.npy', encoder.classes_)
         if task_type == 'regression':
             y = features[label].values
 

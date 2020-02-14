@@ -174,7 +174,7 @@ if __name__ == '__main__':
         'label': 'Survived',
         'features': ["Pclass", "Fare", "Age", "Sex"]
     }
-    saved_model_filename = 'my_model.sav'
+    saved_model_filename = 'model/my_model.sav'
 
     data_columns = get_column_names(dataset_filename)
     print(data_columns)
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     print("Score: ", sum(score) / len(score))
 
     # predict by model
-    saved_model_filename = 'my_model.sav'
+    saved_model_filename = 'model/my_model.sav'
     real_data = pd.read_csv('test.csv')
     params = {
         'index': 'PassengerId',
