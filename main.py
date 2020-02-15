@@ -107,6 +107,8 @@ def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree'
             model = LinearRegression()
         elif algorithm == 'knn':
             model = KNeighborsRegressor()
+        elif algorithm == 'svm':
+            model = svm.SVR(random_state=241)
         elif algorithm == 'mlp':
             model = MLPRegressor(random_state=241)
         elif algorithm == 'rf':

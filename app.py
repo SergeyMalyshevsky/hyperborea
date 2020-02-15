@@ -120,6 +120,7 @@ def user_code():
             'decision_tree': 'Decision Tree',
             'linear_regression': 'Linear Regression',
             'knn': 'Nearest Neighbors',
+            'svm': 'Support Vector Machines',
             'mlp': 'Multi-layer Perceptron',
             'rf': 'Random Forest',
             'gradient_boosting': 'Gradient Boosting',
