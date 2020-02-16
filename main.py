@@ -6,54 +6,15 @@ from sklearn import svm
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, GradientBoostingClassifier, \
     GradientBoostingRegressor
 from sklearn.linear_model import SGDClassifier, LogisticRegression, LinearRegression
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import cross_val_score
 from sklearn.naive_bayes import GaussianNB
-from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor, RadiusNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder
 
-from preprocessing import get_features_and_labels
+from preprocessing import get_features_and_labels, create_preprocessor, get_column_names
 from user_data_preprocessing import preprocess_data_function
-
-
-def get_column_names(filename):
-    data_columns = pd.read_csv(filename, nrows=0, sep=',').columns.tolist()
-    return data_columns
-
-
-def create_preprocessor(X_train):
-    # PREPROCESSING
-
-    # "Cardinality" means the number of unique values in a column
-    # Select categorical columns with relatively low cardinality (convenient but arbitrary)
-    low_cardinality_cols = [cname for cname in X_train.columns if X_train[cname].nunique() < 10 and
-                            X_train[cname].dtype == "object"]
-
-    # Select numeric columns
-    numeric_cols = [cname for cname in X_train.columns if X_train[cname].dtype in ['int64', 'float64']]
-
-    # Bundle preprocessing for numerical and categorical data
-    # Preprocessing for numerical data
-    numerical_transformer = SimpleImputer(strategy='constant')
-
-    # Preprocessing for categorical data
-    categorical_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='most_frequent')),
-        ('onehot', OneHotEncoder(handle_unknown='ignore'))
-    ])
-
-    # Bundle preprocessing for numerical and categorical data
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', numerical_transformer, numeric_cols),
-            ('cat', categorical_transformer, low_cardinality_cols)
-        ])
-
-    return preprocessor
 
 
 def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree', task_type='classification'):
@@ -85,8 +46,6 @@ def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree'
             model = LogisticRegression()
         elif algorithm == 'knn':
             model = KNeighborsClassifier()
-        # elif algorithm == 'rn':
-        #     model = RadiusNeighborsClassifier()
         elif algorithm == 'svm':
             model = svm.SVC(random_state=241)
         elif algorithm == 'naive_bayes':
