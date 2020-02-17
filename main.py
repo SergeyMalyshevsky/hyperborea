@@ -10,6 +10,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
 from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn.preprocessing import RobustScaler, MinMaxScaler, MaxAbsScaler, StandardScaler
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.pipeline import Pipeline
 
@@ -75,7 +76,18 @@ def train_model(dataset, fields, saved_model_filename, algorithm='decision_tree'
         elif algorithm == 'gradient_boosting':
             model = GradientBoostingRegressor(random_state=241)
 
+    scaler_name = 'robust'
+    if scaler_name == 'robust':
+        scaler = RobustScaler()
+    elif scaler_name == 'min_max':
+        scaler = MinMaxScaler()
+    elif scaler_name == 'max_abs':
+        scaler = MaxAbsScaler()
+    elif scaler_name == 'standard':
+        scaler = StandardScaler()
+
     pipeline = Pipeline(steps=[('preprocessor', preprocessor),
+                               ('scaler', scaler),
                                ('model', model)
                                ])
 
