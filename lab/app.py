@@ -6,11 +6,15 @@ import os
 # Init app
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
+
 # Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'database/db.sqlite')
+app.config['PROJECTS_DIRECTORY'] = os.path.join(basedir, 'projects')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 # Init db
 db = SQLAlchemy(app)
+
 # Init ma
 ma = Marshmallow(app)
 
@@ -48,6 +52,12 @@ def get_version():
 def add_project():
     name = request.json['name']
     description = request.json['description']
+
+    new_directory = app.config['PROJECTS_DIRECTORY'] + '/' + name
+    if not os.path.exists():
+        os.mkdir(new_directory)
+    else:
+        return jsonify({'error': 'Directory already exists'})
 
     new_project = Project(name, description)
 
