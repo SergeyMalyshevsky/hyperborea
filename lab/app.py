@@ -21,15 +21,30 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 
-# Project Class/Model
+# Classes
 class Project(db.Model):
+    __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
     description = db.Column(db.String(200))
+    experiments = db.relationship("Experiment")
 
     def __init__(self, name, description):
         self.name = name
         self.description = description
+
+
+class Experiment(db.Model):
+    __tablename__ = 'experiment'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True)
+    description = db.Column(db.String(200))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+
+    def __init__(self, name, description, project_id):
+        self.name = name
+        self.description = description
+        self.project_id = project_id
 
 
 # Project Schema
@@ -38,9 +53,18 @@ class ProjectSchema(ma.Schema):
         fields = ('id', 'name', 'description')
 
 
+# Project Schema
+class ExperimentSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'name', 'description', 'project_id')
+
+
 # Init schema
 project_schema = ProjectSchema()
 projects_schema = ProjectSchema(many=True)
+
+experiment_schema = ExperimentSchema()
+experiments_schema = ExperimentSchema(many=True)
 
 
 # get version
@@ -66,6 +90,8 @@ def add_project():
     project_directory = app.config['PROJECTS_DIRECTORY'] + '/' + name
     if not os.path.exists(project_directory):
         os.mkdir(project_directory)
+        os.mkdir(project_directory + '/dataset')
+        os.mkdir(project_directory + '/experiments')
     else:
         return jsonify({'error': 'Directory already exists'})
 
@@ -127,6 +153,97 @@ def delete_project(id):
         print('Error while deleting directory')
 
     return project_schema.jsonify(project)
+
+
+# Create an Experiment
+@app.route('/experiment', methods=['POST'])
+def add_experiment():
+    """
+    Example of body
+
+    {
+	"name": "Decision Tree",
+	"description": "Try to use decision tree",
+	"project_id": 1
+    }
+    """
+    name = request.json['name']
+    description = request.json['description']
+    project_id = request.json['project_id']
+
+    project = Project.query.get(project_id)
+
+    experiment_directory = app.config['PROJECTS_DIRECTORY'] + '/' + project.name + '/experiments/' + name
+    if not os.path.exists(experiment_directory):
+        os.mkdir(experiment_directory)
+        os.mkdir(experiment_directory + '/model')
+    else:
+        return jsonify({'error': 'Directory already exists'})
+
+    new_experiment = Experiment(name, description, project_id)
+
+    db.session.add(new_experiment)
+    db.session.commit()
+
+    return project_schema.jsonify(new_experiment)
+
+
+# Get All experiments
+@app.route('/experiment', methods=['GET'])
+def get_experiments():
+    all_experiments = Experiment.query.all()
+    result = experiments_schema.dump(all_experiments)
+    if result:
+        print(result)
+        return jsonify(result)
+    else:
+        return {'answer': 'There is no data'}
+
+
+# Get Single projects
+@app.route('/experiment/<id>', methods=['GET'])
+def get_experiment(id):
+    experiment = Experiment.query.get(id)
+    return experiment_schema.jsonify(experiment)
+
+
+# Update a project
+@app.route('/experiment/<id>', methods=['PUT'])
+def update_experiment(id):
+    experiment = Experiment.query.get(id)
+
+    name = request.json['name']
+    description = request.json['description']
+    project_id = request.json['project_id']
+
+    experiment.name = name
+    experiment.description = description
+    experiment.project_id = project_id
+
+    db.session.commit()
+
+    return project_schema.jsonify(experiment)
+
+
+# Delete project
+@app.route('/experiment/<id>', methods=['DELETE'])
+def delete_experiment(id):
+    experiment = Experiment.query.get(id)
+    name = experiment.name
+    project_id = experiment.project_id
+
+    project = Project.query.get(project_id)
+
+    db.session.delete(experiment)
+    db.session.commit()
+
+    experiment_directory = app.config['PROJECTS_DIRECTORY'] + '/' + project.name + '/experiments/' + name
+    try:
+        shutil.rmtree(experiment_directory)
+    except:
+        print('Error while deleting directory')
+
+    return project_schema.jsonify(experiment)
 
 
 # Run Server
