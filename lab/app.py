@@ -1,7 +1,9 @@
+import os
+import shutil
+
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-import os
 
 # Init app
 app = Flask(__name__)
@@ -50,12 +52,20 @@ def get_version():
 # Create a Project
 @app.route('/project', methods=['POST'])
 def add_project():
+    """
+    Example of body
+
+    {
+	"name": "Titanic competition",
+	"description": "Find survive passengers"
+    }
+    """
     name = request.json['name']
     description = request.json['description']
 
-    new_directory = app.config['PROJECTS_DIRECTORY'] + '/' + name
-    if not os.path.exists():
-        os.mkdir(new_directory)
+    project_directory = app.config['PROJECTS_DIRECTORY'] + '/' + name
+    if not os.path.exists(project_directory):
+        os.mkdir(project_directory)
     else:
         return jsonify({'error': 'Directory already exists'})
 
@@ -106,8 +116,15 @@ def update_project(id):
 @app.route('/project/<id>', methods=['DELETE'])
 def delete_project(id):
     project = Project.query.get(id)
+    name = project.name
     db.session.delete(project)
     db.session.commit()
+
+    project_directory = app.config['PROJECTS_DIRECTORY'] + '/' + name
+    try:
+        shutil.rmtree(project_directory)
+    except:
+        print('Error while deleting directory')
 
     return project_schema.jsonify(project)
 
