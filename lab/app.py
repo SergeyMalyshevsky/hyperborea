@@ -109,7 +109,6 @@ def get_projects():
     all_projects = Project.query.all()
     result = projects_schema.dump(all_projects)
     if result:
-        print(result)
         return jsonify(result)
     else:
         return {'answer': 'There is no data'}
@@ -194,7 +193,6 @@ def get_experiments():
     all_experiments = Experiment.query.all()
     result = experiments_schema.dump(all_experiments)
     if result:
-        print(result)
         return jsonify(result)
     else:
         return {'answer': 'There is no data'}
